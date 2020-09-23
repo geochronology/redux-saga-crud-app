@@ -6,6 +6,7 @@ import axios from 'axios'
 import reducers from './reducers'
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
+import { composeWithDevTools } from 'redux-devtools-extension'
 
 // imports to get redux-saga to work
 import createSagaMiddleware from 'redux-saga'
@@ -16,7 +17,10 @@ axios.defaults.baseURL = 'http://rem-rest-api.herokuapp.com/api/users'
 
 const sagaMiddleware = createSagaMiddleware()
 
-const store = createStore(reducers, applyMiddleware(sagaMiddleware))
+// config for redux tools
+// const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
+
+const store = createStore(reducers, undefined, composeWithDevTools(applyMiddleware(sagaMiddleware)))
 
 // call run in order to run the middleware
 sagaMiddleware.run(rootSaga)

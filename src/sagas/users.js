@@ -1,4 +1,4 @@
-import { takeEvery, call, fork } from 'redux-saga/effects'
+import { takeEvery, call, fork, put } from 'redux-saga/effects'
 import * as actions from '../actions/users'
 import * as api from '../api/users'
 
@@ -7,7 +7,11 @@ function* getUsers() {
     // once the <call> to api.getUsers resolves, it's going to assign the result to result;
     // any code in the block afterwards will be run once the call has resolved
     const result = yield call(api.getUsers)
-    console.log(result)
+
+    // load results of api call into redux state
+    yield put(actions.getUsersSuccess({
+      items: result.data.data
+    }))
   } catch (e) { }
 }
 
