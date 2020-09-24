@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux'
-import { getUsersRequest, createUserRequest } from '../actions/users'
+import { getUsersRequest, createUserRequest, deleteUserRequest } from '../actions/users'
 import UsersList from './UsersList'
 import NewUserForm from './NewUserForm'
 
@@ -11,7 +11,7 @@ import NewUserForm from './NewUserForm'
 //    being dispatched, we then act upon that with a getUsers worker saga
 // 3. getUsers will call the api to get the users and will log the result
 
-function App({ getUsersRequest, createUserRequest, users }) {
+function App({ getUsersRequest, createUserRequest, deleteUserRequest, users }) {
 
   useEffect(() => {
     getUsersRequest()
@@ -24,10 +24,14 @@ function App({ getUsersRequest, createUserRequest, users }) {
     })
   }
 
+  const handleDeleteUserClick = (userId) => {
+    deleteUserRequest(userId)
+  }
+
   return (
     <div style={{ margin: '0 auto', padding: '20px', maxWidth: '600px' }}>
       <NewUserForm onSubmit={handleSubmit} />
-      <UsersList users={users.items} />
+      <UsersList onDeleteUser={handleDeleteUserClick} users={users.items} />
     </div>
   );
 }
@@ -36,5 +40,6 @@ function App({ getUsersRequest, createUserRequest, users }) {
 // take users from store and make it accessible as props
 export default connect(({ users }) => ({ users }), {
   getUsersRequest,
-  createUserRequest
+  createUserRequest,
+  deleteUserRequest
 })(App);

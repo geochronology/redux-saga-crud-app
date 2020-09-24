@@ -1,5 +1,5 @@
 import { act } from 'react-dom/test-utils'
-import { takeEvery, takeLatest, call, fork, put } from 'redux-saga/effects'
+import { takeEvery, takeLatest, take, call, fork, put } from 'redux-saga/effects'
 import * as actions from '../actions/users'
 import * as api from '../api/users'
 
@@ -40,18 +40,39 @@ function* createUser(action) {
   }
 }
 
-
 // takeLatest: cancels unresolved requests and replaces with new ones
 function* watchCreateUserRequest() {
   yield takeLatest(actions.Types.CREATE_USER_REQUEST, createUser)
 }
+
+function* deleteUser({ userId }) {
+  try {
+    yield call(api.deleteUser, userId);
+    yield call(getUsers);
+  } catch (e) {
+
+  }
+}
+
+// take is a lower level effect 
+function* watchDeleteUserRequest() {
+  // until this resolves, we're unable to come back into the while loop
+  while (true) {
+    const action = yield take(actions.Types.DELETE_USER_REQUEST)
+    yield call(deleteUser, {
+      userId: action.payload.userId
+    })
+  }
+}
+
 
 const usersSagas = [
   // explanation of forks is at 6min mark in section 10 of video,
   // and a diagram is also in folder;
   // tldr: a fork creates a *forked* process, which run in parallel
   fork(watchGetUsersRequest),
-  fork(watchCreateUserRequest)
+  fork(watchCreateUserRequest),
+  fork(watchDeleteUserRequest)
 ]
 
 export default usersSagas
