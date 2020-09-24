@@ -4,6 +4,9 @@ import * as actions from '../actions/users'
 import * as api from '../api/users'
 
 function* getUsers() {
+  // the reason for putting the code in try/catch blocks is to
+  // prevent the error from bubbling up to the root saga, which
+  // could then potentially cause other errors
   try {
     // once the <call> to api.getUsers resolves, it's going to assign the result to result;
     // any code in the block afterwards will be run once the call has resolved
@@ -13,7 +16,11 @@ function* getUsers() {
     yield put(actions.getUsersSuccess({
       items: result.data.data
     }))
-  } catch (e) { }
+  } catch (e) {
+    yield put(actions.usersError({
+      error: 'An error occured when get tang'
+    }))
+  }
 }
 
 // This is a watcher saga. It watches when one particular redux action 
@@ -36,7 +43,9 @@ function* createUser(action) {
     // the latest users
     yield call(getUsers)
   } catch (err) {
-
+    yield put(actions.usersError({
+      error: 'An error occured when creatang'
+    }))
   }
 }
 
@@ -49,8 +58,10 @@ function* deleteUser({ userId }) {
   try {
     yield call(api.deleteUser, userId);
     yield call(getUsers);
-  } catch (e) {
-
+  } catch (err) {
+    yield put(actions.usersError({
+      error: 'An error occured when deleeting'
+    }))
   }
 }
 
