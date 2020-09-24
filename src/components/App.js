@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux'
-import { getUsersRequest, createUserRequest, deleteUserRequest } from '../actions/users'
+import { getUsersRequest, createUserRequest, deleteUserRequest, usersError } from '../actions/users'
+import { Alert } from 'reactstrap'
 import UsersList from './UsersList'
 import NewUserForm from './NewUserForm'
 
@@ -11,7 +12,7 @@ import NewUserForm from './NewUserForm'
 //    being dispatched, we then act upon that with a getUsers worker saga
 // 3. getUsers will call the api to get the users and will log the result
 
-function App({ getUsersRequest, createUserRequest, deleteUserRequest, users }) {
+function App({ getUsersRequest, createUserRequest, deleteUserRequest, users, users: { error }, usersError }) {
 
   useEffect(() => {
     getUsersRequest()
@@ -28,8 +29,17 @@ function App({ getUsersRequest, createUserRequest, deleteUserRequest, users }) {
     deleteUserRequest(userId)
   }
 
+  const handleCloseAlert = () => {
+    usersError({
+      error: ''
+    })
+  }
+
   return (
     <div style={{ margin: '0 auto', padding: '20px', maxWidth: '600px' }}>
+      <Alert color="danger" isOpen={!!error} toggle={handleCloseAlert}>
+        {error}
+      </Alert>
       <NewUserForm onSubmit={handleSubmit} />
       <UsersList onDeleteUser={handleDeleteUserClick} users={users.items} />
     </div>
@@ -41,5 +51,6 @@ function App({ getUsersRequest, createUserRequest, deleteUserRequest, users }) {
 export default connect(({ users }) => ({ users }), {
   getUsersRequest,
   createUserRequest,
-  deleteUserRequest
+  deleteUserRequest,
+  usersError
 })(App);
