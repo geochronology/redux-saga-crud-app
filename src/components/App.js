@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { connect } from 'react-redux'
-import { getUsersRequest } from '../actions/users'
+import { getUsersRequest, createUserRequest } from '../actions/users'
 import UsersList from './UsersList'
 import NewUserForm from './NewUserForm'
 
@@ -11,14 +11,17 @@ import NewUserForm from './NewUserForm'
 //    being dispatched, we then act upon that with a getUsers worker saga
 // 3. getUsers will call the api to get the users and will log the result
 
-function App({ getUsersRequest, users }) {
+function App({ getUsersRequest, createUserRequest, users }) {
 
   useEffect(() => {
     getUsersRequest()
   }, [])
 
   const handleSubmit = ({ firstName, lastName }) => {
-    console.log(firstName, lastName)
+    createUserRequest({
+      firstName,
+      lastName
+    })
   }
 
   return (
@@ -29,7 +32,9 @@ function App({ getUsersRequest, users }) {
   );
 }
 
+// MAPPING TO THE PROPS
 // take users from store and make it accessible as props
 export default connect(({ users }) => ({ users }), {
-  getUsersRequest
+  getUsersRequest,
+  createUserRequest
 })(App);

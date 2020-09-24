@@ -1,4 +1,5 @@
-import { takeEvery, call, fork, put } from 'redux-saga/effects'
+import { act } from 'react-dom/test-utils'
+import { takeEvery, takeLatest, call, fork, put } from 'redux-saga/effects'
 import * as actions from '../actions/users'
 import * as api from '../api/users'
 
@@ -22,10 +23,35 @@ function* watchGetUsersRequest() {
   yield takeEvery(actions.Types.GET_USERS_REQUEST, getUsers)
 }
 
+// This saga extracts properties from the dispatched redux action
+function* createUser(action) {
+  try {
+    // The way call works: if we want to call arguments against the api,
+    // then they get passed in afterwards as additional arguments
+    yield call(api.createUser, {
+      firstName: action.payload.firstName,
+      lastName: action.payload.lastName
+    })
+    // call the getUsers saga again, which will update the state with
+    // the latest users
+    yield call(getUsers)
+  } catch (err) {
+
+  }
+}
+
+
+// takeLatest: cancels unresolved requests and replaces with new ones
+function* watchCreateUserRequest() {
+  yield takeLatest(actions.Types.CREATE_USER_REQUEST, createUser)
+}
+
 const usersSagas = [
-  // explanation of forks is at 6min mark in section 10 of video; diagram is also in folder;
-  // a fork creates a *forked* process, which run in parallel
-  fork(watchGetUsersRequest)
+  // explanation of forks is at 6min mark in section 10 of video,
+  // and a diagram is also in folder;
+  // tldr: a fork creates a *forked* process, which run in parallel
+  fork(watchGetUsersRequest),
+  fork(watchCreateUserRequest)
 ]
 
 export default usersSagas
