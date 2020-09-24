@@ -7,6 +7,7 @@ import reducers from './reducers'
 import { Provider } from 'react-redux'
 import { createStore, applyMiddleware } from 'redux'
 import { composeWithDevTools } from 'redux-devtools-extension'
+import 'bootstrap/dist/css/bootstrap.min.css'
 
 // imports to get redux-saga to work
 import createSagaMiddleware from 'redux-saga'

@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux'
 import { getUsersRequest } from '../actions/users'
+import UsersList from './UsersList'
+import NewUserForm from './NewUserForm'
 
 // (Application lifecycle explained in Section 12)
 // 1. When we render the app, we fire the getUsersRequest redux action
@@ -9,17 +11,25 @@ import { getUsersRequest } from '../actions/users'
 //    being dispatched, we then act upon that with a getUsers worker saga
 // 3. getUsers will call the api to get the users and will log the result
 
-function App({ getUsersRequest }) {
-  getUsersRequest()
+function App({ getUsersRequest, users }) {
+
+  useEffect(() => {
+    getUsersRequest()
+  }, [])
+
+  const handleSubmit = ({ firstName, lastName }) => {
+    console.log(firstName, lastName)
+  }
+
   return (
-    <div>
-      Test
+    <div style={{ margin: '0 auto', padding: '20px', maxWidth: '600px' }}>
+      <NewUserForm onSubmit={handleSubmit} />
+      <UsersList users={users.items} />
     </div>
   );
 }
 
-// this seems to have the effect of adding getUsersRequest
-// to the App component passed in as props
-export default connect(null, {
+// take users from store and make it accessible as props
+export default connect(({ users }) => ({ users }), {
   getUsersRequest
 })(App);
